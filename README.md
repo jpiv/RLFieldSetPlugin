@@ -5,11 +5,11 @@ Rocket League bakkesmod plugin and python module for setting field state.
 1) Copy `FieldSetPlugin.dll` to `bakkesmod/plugins` directory
 2) Edit `bakkesmod/cfg/plugins.cfg` and add line `plugin load fieldsetplugin`
 
-## Note:
+## Note
 Always initialize field set before building RLGym environment
 
 
-## Examples:
+## Examples
 ```
 from field_set import FieldSet
 import rlgym
