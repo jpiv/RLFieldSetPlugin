@@ -5,13 +5,17 @@ Rocket League bakkesmod plugin and python module for setting field state.
 1) Copy `FieldSetPlugin.dll` to `bakkesmod/plugins` directory
 2) Edit `bakkesmod/cfg/plugins.cfg` and add line `plugin load fieldsetplugin`
 
+## Note:
+Always initialize field set before building RLGym environment
+
+
 ## Examples:
 ```
 from field_set import FieldSet
 import rlgym
 
-env = rlgym.make("default")
 field_set = FieldSet()
+env = rlgym.make("default")
 
 while True:
     obs = env.reset()
