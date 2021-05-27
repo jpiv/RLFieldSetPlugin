@@ -5,40 +5,48 @@ import win32pipe
 class Piper:
   PLUGIN_PIPE_SIZE = 512 
 
-  def __init__(self):
+  def __init__(self, logger=None):
     self._pipe = None
     self._connected = False
+    self.logger = logger
 
   @staticmethod
   def format_pipe_id(pipe_id):
       return r"\\.\pipe\{}".format(pipe_id)
 
+  def log(self, message):
+    if self.logger is not None:
+      self.logger.warning(message)
+
   # Dont change pipe_name, Not implemented yet
-  def open_pipe(self, pipe_name='field_set_pipe', num_allowed_instances=1):
-      self._connected = False
+  def open_pipe(self, pipe_name=None, num_allowed_instances=1):
+    if pipe_name is None:
+      pipe_name = 'field_set_pipe'
 
-      pool = ThreadPool(processes=1)
+    self._connected = False
 
-      self._pipe = win32pipe.CreateNamedPipe(Piper.format_pipe_id(pipe_name),
-                                             win32pipe.PIPE_ACCESS_DUPLEX | win32file.FILE_FLAG_OVERLAPPED,
+    pool = ThreadPool(processes=1)
 
-                                             win32pipe.PIPE_TYPE_MESSAGE |
-                                             win32pipe.PIPE_READMODE_MESSAGE |
-                                             win32pipe.PIPE_WAIT,
+    self._pipe = win32pipe.CreateNamedPipe(Piper.format_pipe_id(pipe_name),
+                                           win32pipe.PIPE_ACCESS_DUPLEX | win32file.FILE_FLAG_OVERLAPPED,
 
-                                             # num_allowed_instances,
+                                           win32pipe.PIPE_TYPE_MESSAGE |
+                                           win32pipe.PIPE_READMODE_MESSAGE |
+                                           win32pipe.PIPE_WAIT,
 
-                                             win32pipe.PIPE_UNLIMITED_INSTANCES,
+                                           # num_allowed_instances,
 
-                                             Piper.PLUGIN_PIPE_SIZE,
-                                             Piper.PLUGIN_PIPE_SIZE, 0, None)
+                                           win32pipe.PIPE_UNLIMITED_INSTANCES,
 
-      win32pipe.ConnectNamedPipe(self._pipe)
+                                           Piper.PLUGIN_PIPE_SIZE,
+                                           Piper.PLUGIN_PIPE_SIZE, 0, None)
 
-      self._connected = True
+    win32pipe.ConnectNamedPipe(self._pipe)
 
-      pool.terminate()
-      pool.join()
+    self._connected = True
+
+    pool.terminate()
+    pool.join()
 
   def write_pipe(self, message):
     win32file.WriteFile(self._pipe, str.encode(message + '\0'))
